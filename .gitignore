@@ -1,0 +1,5 @@
+# metals
+.bps
+.metals
+.scala-build
+.vscode
