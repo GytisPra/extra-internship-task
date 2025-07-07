@@ -1,10 +1,10 @@
-### Usage
+## Usage
 
 This is a normal sbt project. You can compile code with `sbt compile`, run it with `sbt run`, and `sbt console` will start a Scala 3 REPL.
 
-### Task
+## Task
 
-# DISCLAIMER: this is a job application task. In our company we don't use xml's, however we want to challenge candidates with difficult file formats.
+### DISCLAIMER: this is a job application task. In our company we don't use xml's, however we want to challenge candidates with difficult file formats.
 
 There are 10 xml files for trains, stations and trips each containing current and historical data. Some files may contain syntax errors.
 
