@@ -3,11 +3,12 @@ package Models
 import os.Path
 import scala.xml.XML
 import scala.xml.Node
+import os.stat
 
 class Trip(
     val id: String,
-    private val train: Train,
-    private val stations: List[Station]
+    val train: Train,
+    val stations: List[Station]
 ):
   override def toString(): String =
     s"TripID: $id, TrainID:${train.id}, Stations:${stations.map(_.id).mkString("[", ",", "]")}"
@@ -92,6 +93,11 @@ def parseTripFromXml(
       case None        => throw new Error(s"trip in file ${xmlFileName} has missing stations")
       case Some(value) => value
     }
+
+  // For the stations we add the trip train seats and the train that goes to that station
+  for station <- tripStations do 
+    station.passengers += tripTrain.seats
+    station.appendTrain(tripTrain)
 
   // create a trip if a train was found and there are no missing stations
   Trip(id.text, tripTrain, tripStations.toList)

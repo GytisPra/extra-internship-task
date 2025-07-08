@@ -10,7 +10,8 @@ lazy val root = project
 
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "os-lib" % "0.11.4",
-      "org.scala-lang.modules" %% "scala-xml" % "2.2.0"
+      "org.scala-lang.modules" %% "scala-xml" % "2.2.0",
+      "com.lihaoyi" %% "upickle" % "4.1.0"
     ) 
   )
 

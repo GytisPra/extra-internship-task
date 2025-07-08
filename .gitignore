@@ -31,5 +31,4 @@ metals.sbt
 .idea_modules
 /.worksheet/
 
-# Output
-output/*.txt
+testXmls

@@ -2,8 +2,10 @@ package Models
 
 import os.Path
 import scala.xml.XML
+import upickle.default.Writer
 
-class Train(val id: String, val seats: Int, val version: Int):
+
+case class Train(val id: String, val seats: Int, val version: Int) derives Writer:
   override def toString(): String = s"$id, $seats, $version"
 
 class Trains(private val trains: List[Train]):

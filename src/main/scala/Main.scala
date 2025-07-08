@@ -6,8 +6,6 @@ import java.io.File
 import javax.xml.transform.stream.StreamSource
 import Models.*
 
-// TODO: 3-4 tasks
-
 @main
 def main(): Unit =
   val xmlFolder = os.list(os.pwd / "src/main/xmls")
@@ -23,4 +21,19 @@ def main(): Unit =
 
   val allStations = parseStationsFromXmlPaths(stationXmlPaths)
   val allTrains   = parseTrainsFromXmlPaths(trainsXmlPaths)
-  val allTrips    = parseTripsFromXmlPaths(tripsXmlPaths, allTrains, allStations)
+
+  val allTrips = parseTripsFromXmlPaths(tripsXmlPaths, allTrains, allStations)
+
+  val top15Stations = allStations.getTop15Stations()
+  val resultsPathTxt = os.pwd / "output" / "top15stations.txt"
+  val resultsPathJson = os.pwd / "output" / "top15stations.json"
+
+  if os.exists(resultsPathTxt) then
+    os.remove(resultsPathTxt)
+
+  if os.exists(resultsPathJson) then
+    os.remove(resultsPathJson)
+
+  top15Stations.foreach(station => os.write.append(resultsPathTxt, station.toResultsString() + "\n"))
+  os.write.append(resultsPathJson, upickle.default.write[List[Station]](top15Stations))
+
