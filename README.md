@@ -4,35 +4,33 @@ This is a normal sbt project. You can compile code with `sbt compile`, run it wi
 
 ## Task
 
-### DISCLAIMER: this is a job application task. In our company we don't use xml's, however we want to challenge candidates with difficult file formats.
-
 There are 10 xml files for trains, stations and trips each containing current and historical data. Some files may contain syntax errors.
 
 The xsd schemas for train, station and trip files are "train.xsd", "station.xsd" and "trip.xsd" respectively.
 
 Quick explanation for elements:
-train:
-	attributes:
-		- version: integer 	        # version number of the record.
-	elements:
-		- id: string 			# a reference id for the train. This may be not unique.
-		- seats: integer		# number of the seats on the train.
-		
-station:
-	attributes:
-		- version: integer	        # version number of the record.
-	elements:
-		- id: string			# a reference id for the station. This may be not unique.
-		- name: string			# a "user readable" name of the station.
-				
-trip:
-	attributes:
-		- version: integer	        # version number of the record.
-	elements:
-		- id: string			# a unique id of the element for the trip.
-		- train: string		        # the id for the train that goes on this trip.
-		- stations: list
-			- station: 		# element containing the id of a station visited by the train on this trip.
+#### `train`:
+- **Attributes**:
+  - `version`: integer — version number of the record.
+- **Elements**:
+  - `id`: string — a reference ID for the train. This may not be unique.
+  - `seats`: integer — number of seats on the train.
+
+#### `station`:
+- **Attributes**:
+  - `version`: integer — version number of the record.
+- **Elements**:
+  - `id`: string — a reference ID for the station. This may not be unique.
+  - `name`: string — a "user-readable" name of the station.
+
+#### `trip`:
+- **Attributes**:
+  - `version`: integer — version number of the record.
+- **Elements**:
+  - `id`: string — a unique ID of the element for the trip.
+  - `train`: string — the ID for the train that goes on this trip.
+  - `stations`: list
+    - `station`: element containing the ID of a station visited by the train on this trip.
 			
 The `version` field denotes a key for some (train, station, trip) pairing and must be the same across all references -  i.e if a trip with a `version = 2` references a train with `version = 1` it is considered invalid and must be discarded.  The same is true for stations.
 
