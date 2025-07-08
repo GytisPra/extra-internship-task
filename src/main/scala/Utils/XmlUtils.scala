@@ -1,8 +1,11 @@
+package Utils
+
 import java.io.File
 import javax.xml.validation.SchemaFactory
 import os.Path
 import javax.xml.XMLConstants
 import javax.xml.transform.stream.StreamSource
+import Main.OutputDir
 
 object XmlUtils:
   /** Validates a given xmf file using an xsd file using. Parsing errors are outputed to
@@ -16,7 +19,7 @@ object XmlUtils:
     *   True if no parsing errors; False otherwise
     */
   private def validate(xmlFile: File, xsdFile: File): Boolean =
-    val errorsPath = os.pwd / "output" / s"${xmlFile.getName}-parsing-errors.txt"
+    val errorsPath = OutputDir.dirPath / s"${xmlFile.getName}-parsing-errors.txt"
 
     if os.exists(errorsPath) then
       os.remove(errorsPath)

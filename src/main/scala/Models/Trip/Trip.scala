@@ -4,6 +4,7 @@ import os.Path
 import scala.xml.XML
 import scala.xml.Node
 import os.stat
+import Main.OutputDir
 
 class Trip(
     val id: String,
@@ -33,7 +34,7 @@ def parseTripsFromXmlPaths(
     allTrains: Trains,
     allStations: Stations
 ): Trips =
-  val errorsPath = os.pwd / "output" / "trips-parsing-errors.txt"
+  val errorsPath = OutputDir.dirPath / "trips-parsing-errors.txt"
   if os.exists(errorsPath) then os.remove(errorsPath)
 
   Trips(

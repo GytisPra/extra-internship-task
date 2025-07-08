@@ -1,3 +1,5 @@
+package Main
+
 import scala.xml._
 import os.Path
 import javax.xml.validation.SchemaFactory
@@ -5,11 +7,15 @@ import javax.xml.XMLConstants
 import java.io.File
 import javax.xml.transform.stream.StreamSource
 import Models.*
+import Utils.XmlUtils
+
+object OutputDir {
+  val dirPath: Path = os.pwd / "output"
+}
 
 @main
 def main(): Unit =
-  val outputDir = os.pwd / "output"
-  if !os.exists(outputDir) then os.makeDir(outputDir)
+  if !os.exists(OutputDir.dirPath) then os.makeDir(OutputDir.dirPath)
 
   val xmlFolder = os.list(os.pwd / "src/main/xmls")
   val xsdFolder = os.list(os.pwd / "src/main/xsd")
@@ -27,11 +33,10 @@ def main(): Unit =
   val allTrips    = parseTripsFromXmlPaths(tripsXmlPaths, allTrains, allStations)
 
   val top15Stations   = allStations.getTop15Stations()
-  val resultsPathTxt  = os.pwd / "output" / "top15stations.txt"
-  val resultsPathJson = os.pwd / "output" / "top15stations.json"
+  val resultsPathTxt  = OutputDir.dirPath / "top15stations.txt"
+  val resultsPathJson = OutputDir.dirPath / "top15stations.json"
 
   if os.exists(resultsPathTxt) then os.remove(resultsPathTxt)
-
   if os.exists(resultsPathJson) then os.remove(resultsPathJson)
 
   top15Stations.foreach(station =>
