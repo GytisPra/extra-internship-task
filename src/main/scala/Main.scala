@@ -8,6 +8,9 @@ import Models.*
 
 @main
 def main(): Unit =
+  val outputDir = os.pwd / "output"
+  if !os.exists(outputDir) then os.makeDir(outputDir)
+
   val xmlFolder = os.list(os.pwd / "src/main/xmls")
   val xsdFolder = os.list(os.pwd / "src/main/xsd")
 
