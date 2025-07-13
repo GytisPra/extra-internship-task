@@ -5,7 +5,6 @@ import numpy as np
 df = pd.read_json('output/top15stations.json').convert_dtypes()
 df.sort_values('name', inplace=True, key=lambda col: col.str.lower())
 
-
 R = df["passengers"].max() - df["passengers"].min() # Range
 n = len(df)                                         # Number of rows
 std = df["passengers"].std()                        # Standard deviation
