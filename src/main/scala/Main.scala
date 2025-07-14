@@ -1,15 +1,13 @@
 package Main
 
-import scala.xml._
 import os.Path
-import javax.xml.validation.SchemaFactory
-import javax.xml.XMLConstants
 import java.io.File
-import javax.xml.transform.stream.StreamSource
-import Models.*
+
+import Models.{Stations, Trains, Trips}
 import Utils.{XmlUtils, OutputUtils}
 import Extensions.IndexedSeqExtensions.{getXsdOrExit, getXmlsOrExit}
-import os.stat
+
+// TODO: draw the distribution graph using scala
 
 @main
 def main(): Unit =
@@ -24,16 +22,16 @@ def main(): Unit =
   val tripXsdFile    = xsdDir.getXsdOrExit("trip")
 
   val stationXmlFiles = xmlDir.getXmlsOrExit("stations", stationXsdFile)
-  val trainsXmlFiles  = xmlDir.getXmlsOrExit("trains", trainXsdFile)
-  val tripsXmlFiles   = xmlDir.getXmlsOrExit("trips", tripXsdFile)
+  val trainXmlFiles   = xmlDir.getXmlsOrExit("trains", trainXsdFile)
+  val tripXmlFiles    = xmlDir.getXmlsOrExit("trips", tripXsdFile)
 
   val allStations        = Stations(stationXmlFiles)
-  val allTrains          = Trains(trainsXmlFiles)
-  val (errors, allTrips) = Trips(tripsXmlFiles, allTrains, allStations)
+  val allTrains          = Trains(trainXmlFiles)
+  val (errors, allTrips) = Trips(tripXmlFiles, allTrains, allStations)
 
   if errors.nonEmpty then OutputUtils.writeErrors("trips-parsing-errors.txt", errors)
 
-  val top15Stations = allStations.getTop15Stations()
+  val top15Stations = allTrips.getTop15Stations()
 
   OutputUtils.writeResults(top15Stations, "top15stations.txt")
   OutputUtils.writeResults(top15Stations, "top15stations.json")

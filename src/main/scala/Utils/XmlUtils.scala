@@ -2,22 +2,22 @@ package Utils
 
 import java.io.File
 import javax.xml.validation.SchemaFactory
-import os.Path
 import javax.xml.XMLConstants
 import javax.xml.transform.stream.StreamSource
 
 object XmlUtils:
-  /** Validates a given xmf file using an xsd file using. Parsing errors are outputed to
-    * output/{xmlFileName}-parsing-errors.txt
+  /** Validates a given xml file using an xsd file.
+    *
+    * Parsing errors are outputed to output/{xmlFileName}-parsing-errors.txt
     *
     * @param xmlFile
     *   The xml file to validate
     * @param xsdFile
     *   The xsd file which is used to validate the entries in the xml file
     * @return
-    *   True if no parsing errors; False otherwise
+    *   Error string if there was an error; None otherwise
     */
-  def validate(xmlFile: File, xsdFile: File): Boolean =
+  def validate(xmlFile: File, xsdFile: File): Option[String] =
     val schemaFactory =
       SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
     val schema        = schemaFactory.newSchema(xsdFile)
@@ -26,12 +26,14 @@ object XmlUtils:
 
     try
       validator.validate(new StreamSource(xmlFile))
-      true
+      None
     catch
       case pe: org.xml.sax.SAXParseException =>
-        val errorMsg =
+        Some(
           s"SAXParseException at line: ${pe.getLineNumber()} in file: ${xmlFile.getName()}: ${pe.getMessage()}\n"
-        OutputUtils.writeErrors(s"${xmlFile.getName}-parsing-errors.txt", errorMsg)
-        false
-      case otherExeption                     =>
-        throw otherExeption
+        )
+      // OutputUtils.writeErrors(s"${xmlFile.getName}-parsing-errors.txt", errorMsg)
+      case otherException                    =>
+        Some(
+          s"Exception: ${otherException.getMessage()}: ${otherException.getStackTrace()}\n"
+        )

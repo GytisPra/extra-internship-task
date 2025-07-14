@@ -2,24 +2,22 @@ package Models
 
 import os.Path
 import scala.xml.XML
-import upickle.default.*
+import upickle.default.Writer
 import java.io.File
 
 case class Station(
     val id: String,
     val name: String,
-    val version: Int,
-    var trains: List[Train],
-    var passengers: Int
+    val version: Int
 ) derives Writer:
   override def toString(): String =
-    s"ID:$id, Name:$name, Version:$version, Passengers:${passengers}"
+    s"ID:$id, Name:$name, Version:$version"
 
-  def toResultsString(): String =
-    s"$name is visited by ${trains.length} trains with ${trains.map(train => train.seats).mkString(",")} respectively - it can recieve $passengers passangers"
-
-  def appendTrain(train: Train): Unit =
-    trains = trains :+ train
+  def getStationTrains(trips: List[Trip]): List[Train] =
+    for
+      trip <- trips
+      if trip.stations.exists(tripStation => tripStation.id == id && tripStation.version == version)
+    yield (trip.train)
 
 class Stations private (private val stations: List[Station]):
   def getStation(stationId: String, version: Int): Either[String, Station] =
@@ -28,22 +26,18 @@ class Stations private (private val stations: List[Station]):
       case Some(value) => Right(value)
     }
 
-  def getTop15Stations(): List[Station] =
-    stations.sortBy(-_.passengers).take(15)
-
 object Stations {
   def apply(xmlFiles: IndexedSeq[File]): Stations =
     new Stations(
       xmlFiles
-        .map(xmlFile =>
+        .flatMap(xmlFile =>
           val xml = XML.loadFile(xmlFile)
 
           (xml \ "station" \\ "id") zip (xml \ "station" \\ "id") zip (xml \ "station" \\ "@version") map {
             case ((id, name), version) =>
-              Station(id.text, name.text, version.text.toInt, List(), 0)
+              Station(id.text, name.text, version.text.toInt)
           }
         )
-        .flatten
         .toList
     )
 }

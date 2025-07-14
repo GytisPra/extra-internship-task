@@ -23,18 +23,28 @@ object IndexedSeqExtensions {
         fileName: String,
         xsdFile: File
     ): IndexedSeq[File] =
-      val results = for
+      val searchResults = for
         path <- indexedSeq
         if path.ext == "xml" && path.last.startsWith(fileName)
-        if XmlUtils.validate(new File(path.toString), xsdFile)
-      yield (File(path.toString))
+      yield {
+        XmlUtils.validate(new File(path.toString), xsdFile) match
+          case None        => Right(File(path.toString))
+          case Some(error) => Left(error)
+      }
+
+      val (errors, results) = searchResults.partitionMap(identity)
 
       if results.isEmpty then
-        OutputUtils.writeAppendErrors(
-          "xmlFilesNotFound.txt",
+        OutputUtils.writeErrors(
+          s"$fileName-not-found.txt",
           s".xml files with name '$fileName' not found"
         )
         sys.exit(1)
-      else results
+      else
+        if errors.nonEmpty then
+          OutputUtils.writeErrors(s"$fileName-parsing-errors.txt", errors.mkString("\n"))
+
+        results
+
   }
 }

@@ -2,7 +2,8 @@ package Utils
 
 import os.Path
 import java.io.File
-import Models.Station
+
+import Models.Result
 
 object OutputUtils {
   private val outputDir = File((os.pwd / "output").toString)
@@ -34,15 +35,15 @@ object OutputUtils {
     else if file.exists && !file.delete then
       throw new Exception(s"Unable to delete ${file.getAbsolutePath}")
 
-  def writeResults(results: List[Station], fileName: String): Unit =
+  def writeResults(results: List[Result], fileName: String): Unit =
     val path = outputDirPath / fileName
     if os.exists(path) then os.remove(path)
 
     path.ext match {
       case "json" =>
-        os.write(path, upickle.default.write[List[Station]](results))
+        os.write(path, upickle.default.write[List[Result]](results))
       case "txt"  =>
-        results.foreach(station => os.write.append(path, station.toResultsString() + "\n"))
+        results.foreach(result => os.write.append(path, result.toString() + "\n"))
       case other  =>
         writeErrors("results-writing-error.txt", s"Unknown filename extension: ${path.last}")
     }

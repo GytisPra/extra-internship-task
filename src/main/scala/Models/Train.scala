@@ -18,7 +18,7 @@ object Trains {
   def apply(xmlFiles: IndexedSeq[File]): Trains =
     new Trains(
       xmlFiles
-        .map(xmlFile =>
+        .flatMap(xmlFile =>
           val xml = XML.loadFile(xmlFile)
 
           (xml \ "train" \\ "seats") zip (xml \ "train" \\ "id") zip (xml \ "train" \\ "@version") map {
@@ -26,7 +26,6 @@ object Trains {
               Train(id.text, seats.text.toInt, version.text.toInt)
           }
         )
-        .flatten
         .toList
     )
 }
