@@ -4,10 +4,8 @@ import os.Path
 import java.io.File
 
 import Models.{Stations, Trains, Trips}
-import Utils.{XmlUtils, OutputUtils}
+import Utils.{XmlUtils, OutputUtils, PlottingUtils}
 import Extensions.IndexedSeqExtensions.{getXsdOrExit, getXmlsOrExit}
-
-// TODO: draw the distribution graph using scala
 
 @main
 def main(): Unit =
@@ -35,3 +33,9 @@ def main(): Unit =
 
   OutputUtils.writeResults(top15Stations, "top15stations.txt")
   OutputUtils.writeResults(top15Stations, "top15stations.json")
+
+  PlottingUtils.drawTop15StationsHistogram(
+    data = top15Stations,
+    title = "Top 15 stations distribution graph (sorted by name)",
+    xlable = "Passengers Count"
+  )
