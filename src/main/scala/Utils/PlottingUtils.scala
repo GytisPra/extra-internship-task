@@ -23,7 +23,7 @@ object PlottingUtils {
 
     p += hist(sortedData, bins = optimalBinNum)
 
-    f.refresh()
+    f.saveas("./output/histogram.pdf")
 
   private def standardDeviation(data: List[Int]): Double =
     val length = data.length

@@ -38,6 +38,7 @@ def main(): Unit =
   OutputUtils.writeResults(top15Stations, "top15stations.txt")
   OutputUtils.writeResults(top15Stations, "top15stations.json")
 
+  // will save the graph to output/histogram.pdf
   PlottingUtils.drawTop15StationsHistogram(
     data = top15Stations,
     title = "Top 15 stations distribution graph (sorted by name)",
