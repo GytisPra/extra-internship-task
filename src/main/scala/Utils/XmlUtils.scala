@@ -32,7 +32,6 @@ object XmlUtils:
         Some(
           s"SAXParseException at line: ${pe.getLineNumber()} in file: ${xmlFile.getName()}: ${pe.getMessage()}\n"
         )
-      // OutputUtils.writeErrors(s"${xmlFile.getName}-parsing-errors.txt", errorMsg)
       case otherException                    =>
         Some(
           s"Exception: ${otherException.getMessage()}: ${otherException.getStackTrace()}\n"

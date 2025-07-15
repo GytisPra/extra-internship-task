@@ -1,15 +1,16 @@
 package Models
 
-import os.Path
-import scala.xml.XML
-import upickle.default.Writer
 import java.io.File
+import os.Path
+import scala.xml.{XML, Node}
+import scala.compiletime.ops.int
+import Models.Train
 
 case class Station(
     val id: String,
     val name: String,
     val version: Int
-) derives Writer:
+):
   override def toString(): String =
     s"ID:$id, Name:$name, Version:$version"
 
@@ -19,6 +20,18 @@ case class Station(
       if trip.stations.exists(tripStation => tripStation.id == id && tripStation.version == version)
     yield (trip.train)
 
+object Station {
+  def apply(xml: Node): Either[String, Station] =
+    val id      = (xml \ "id").text
+    val name    = (xml \ "name").text
+    val version = (xml \ "@version").text
+
+    if version.isBlank then Left(s"Station has a missing version attribute.")
+    else if id.isBlank then Left(s"Station has a blank id.")
+    else if name.isBlank then Left(s"Station has a blank name.")
+    else Right(Station(id, name, version.toInt))
+}
+
 class Stations private (private val stations: List[Station]):
   def getStation(stationId: String, version: Int): Either[String, Station] =
     stations.find(station => station.id == stationId && station.version == version) match {
@@ -27,17 +40,25 @@ class Stations private (private val stations: List[Station]):
     }
 
 object Stations {
-  def apply(xmlFiles: IndexedSeq[File]): Stations =
-    new Stations(
-      xmlFiles
-        .flatMap(xmlFile =>
-          val xml = XML.loadFile(xmlFile)
+  def apply(xmlFiles: IndexedSeq[File]): (String, Stations) =
+    val results = xmlFiles
+      .map(xmlFile =>
+        val xml         = XML.loadFile(xmlFile)
+        val stationXmls = (xml \\ "station")
 
-          (xml \ "station" \\ "id") zip (xml \ "station" \\ "id") zip (xml \ "station" \\ "@version") map {
-            case ((id, name), version) =>
-              Station(id.text, name.text, version.text.toInt)
-          }
+        val parsingResults = stationXmls.map(Station(_) match
+          case Left(error)    => Left(s"Error in file ${xmlFile.getName}: $error")
+          case Right(station) => Right(station)
         )
-        .toList
-    )
+
+        val (errors, stations) = parsingResults.partitionMap(identity)
+
+        if errors.nonEmpty then Left(errors)
+        else Right(stations)
+      )
+      .toList
+
+    val (errors, stations) = results.partitionMap(identity)
+
+    (errors.flatten.mkString("\n"), new Stations(stations.flatten))
 }

@@ -7,13 +7,39 @@ import java.io.File
 
 import Models.Result
 
-class Trip(
+class Trip private (
     val id: String,
     val train: Train,
     val stations: List[Station]
 ):
   override def toString(): String =
     s"TripID: $id, TrainID:${train.id}, Stations:${stations.map(_.id).mkString("[", ",", "]")}"
+
+object Trip {
+  def apply(
+      tripXml: Node,
+      allTrains: Trains,
+      allStations: Stations,
+      xmlFileName: String
+  ): Either[String, Trip] =
+    val id      = (tripXml \ "id").text             // Trip id
+    val version = (tripXml \ "@version").text.toInt // Trip version
+    val trainId = (tripXml \ "train").text          // Train id
+
+    allTrains.getTrain(trainId, version) match
+      case Left(error)      => Left(error + s" for trip with ID: $id in file ${xmlFileName}\n")
+      case Right(tripTrain) =>
+        val tripStationsResults =
+          (tripXml \\ "station").map(sId => allStations.getStation(sId.text, version)) map {
+            case Left(error) => Left(error + s" for trip with ID: $id in file ${xmlFileName}\n")
+            case Right(trip) => Right(trip)
+          }
+
+        val (errors, tripStations) = tripStationsResults.partitionMap(identity)
+
+        if errors.nonEmpty then Left(errors.mkString)
+        else Right(new Trip(id, tripTrain, tripStations.toList))
+}
 
 class Trips private (private val trips: List[Trip]):
   def getTop15Stations(): List[Result] =
@@ -38,34 +64,10 @@ object Trips {
       val xml      = XML.loadFile(xmlFile)
       val tripXmls = (xml \\ "trip")
 
-      tripXmls.map(tripXml => parseTripFromXml(tripXml, allTrains, allStations, xmlFile.getName()))
+      tripXmls.map(tripXml => Trip(tripXml, allTrains, allStations, xmlFile.getName()))
     )
 
     val (errors, trips) = results.partitionMap(identity)
 
     (errors.mkString, new Trips(trips.toList))
-
-  def parseTripFromXml(
-      tripXml: Node,
-      allTrains: Trains,
-      allStations: Stations,
-      xmlFileName: String
-  ): Either[String, Trip] =
-    val id      = (tripXml \ "id").text             // Trip id
-    val version = (tripXml \ "@version").text.toInt // Trip version
-    val trainId = (tripXml \ "train").text          // Train id
-
-    allTrains.getTrain(trainId, version) match
-      case Left(error)      => Left(error + s" for trip with ID: $id in file ${xmlFileName}\n")
-      case Right(tripTrain) =>
-        val tripStationsResults =
-          (tripXml \\ "station").map(sId => allStations.getStation(sId.text, version)) map {
-            case Left(error) => Left(error + s" for trip with ID: $id in file ${xmlFileName}\n")
-            case Right(trip) => Right(trip)
-          }
-
-        val (errors, tripStations) = tripStationsResults.partitionMap(identity)
-
-        if errors.nonEmpty then Left(errors.mkString)
-        else Right(Trip(id, tripTrain, tripStations.toList))
 }

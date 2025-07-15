@@ -17,7 +17,7 @@ object PlottingUtils {
 
     val range     = sortedData.max - sortedData.min
     val numOfRows = sortedData.length
-    val std       = standartDeviation(sortedData)
+    val std       = standardDeviation(sortedData)
 
     val optimalBinNum = math.ceil(range * ((math.pow(numOfRows, 0.3)) / (3.49 * std))).toInt
 
@@ -25,7 +25,7 @@ object PlottingUtils {
 
     f.refresh()
 
-  private def standartDeviation(data: List[Int]): Double =
+  private def standardDeviation(data: List[Int]): Double =
     val length = data.length
     val sum    = data.sum
 

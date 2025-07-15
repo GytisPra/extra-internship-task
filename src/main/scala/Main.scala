@@ -3,7 +3,7 @@ package Main
 import os.Path
 import java.io.File
 
-import Models.{Stations, Trains, Trips}
+import Models.{Stations, Trips, Trains}
 import Utils.{XmlUtils, OutputUtils, PlottingUtils}
 import Extensions.IndexedSeqExtensions.{getXsdOrExit, getXmlsOrExit}
 
@@ -23,11 +23,15 @@ def main(): Unit =
   val trainXmlFiles   = xmlDir.getXmlsOrExit("trains", trainXsdFile)
   val tripXmlFiles    = xmlDir.getXmlsOrExit("trips", tripXsdFile)
 
-  val allStations        = Stations(stationXmlFiles)
-  val allTrains          = Trains(trainXmlFiles)
-  val (errors, allTrips) = Trips(tripXmlFiles, allTrains, allStations)
+  val (stationErrors, allStations) = Stations(stationXmlFiles)
+  val (trainErrors, allTrains)     = Trains(trainXmlFiles)
+  val (tripErrors, allTrips)       = Trips(tripXmlFiles, allTrains, allStations)
 
-  if errors.nonEmpty then OutputUtils.writeErrors("trips-parsing-errors.txt", errors)
+  if stationErrors.nonEmpty then
+    OutputUtils.writeAppendErrors("stations-parsing-errors.txt", stationErrors)
+  if trainErrors.nonEmpty then
+    OutputUtils.writeAppendErrors("trains-parsing-errors.txt", trainErrors)
+  if tripErrors.nonEmpty then OutputUtils.writeAppendErrors("trips-parsing-errors.txt", tripErrors)
 
   val top15Stations = allTrips.getTop15Stations()
 

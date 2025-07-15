@@ -33,4 +33,3 @@ metals.sbt
 
 output/*
 errors/*
-testXmls
