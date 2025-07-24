@@ -14,12 +14,6 @@ case class Station(
   override def toString(): String =
     s"ID:$id, Name:$name, Version:$version"
 
-  def getStationTrains(trips: List[Trip]): List[Train] =
-    for
-      trip <- trips
-      if trip.stations.exists(tripStation => tripStation.id == id && tripStation.version == version)
-    yield (trip.train)
-
 object Station {
   def apply(xml: Node): Either[String, Station] =
     val id      = (xml \ "id").text
@@ -38,6 +32,16 @@ class Stations private (private val stations: List[Station]):
       case None        => Left(s"station (ID: $stationId; version: $version) not found")
       case Some(value) => Right(value)
     }
+
+  def getTop15Stations(trips: Trips): List[Result] =
+    val results = stations.map(station =>
+      val trains          = trips.getStationTrains(station)
+      val numOfPassengers = trains.map(_.seats).sum
+
+      Result(station, numOfPassengers, trains)
+    )
+
+    results.sortBy(-_.passengers).take(15)
 
 object Stations {
   def apply(xmlFiles: IndexedSeq[File]): (String, Stations) =

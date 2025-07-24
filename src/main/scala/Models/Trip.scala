@@ -42,17 +42,11 @@ object Trip {
 }
 
 class Trips private (private val trips: List[Trip]):
-  def getTop15Stations(): List[Result] =
-    val allStations = trips.flatMap(_.stations).distinct
-
-    val results = allStations.map(station =>
-      val trains          = station.getStationTrains(trips)
-      val numOfPassengers = trains.map(_.seats).sum
-
-      Result(station, numOfPassengers, trains)
-    )
-
-    results.sortBy(-_.passengers).take(15)
+  def getStationTrains(station: Station): List[Train] =
+    for
+      trip <- trips
+      if trip.stations.exists(tripStation => tripStation.id == station.id && tripStation.version == station.version)
+    yield (trip.train)
 
 object Trips {
   def apply(

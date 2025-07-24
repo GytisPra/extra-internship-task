@@ -13,6 +13,7 @@ object Result {
   implicit val resultWriter: Writer[Result] =
     writer[Obj].comap(result =>
       Obj(
+        "id"         -> result.station.id,
         "name"       -> result.station.name,
         "passengers" -> result.passengers,
         "trains"     -> Value(write[List[Train]](result.trains))

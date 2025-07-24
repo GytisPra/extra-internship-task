@@ -33,7 +33,7 @@ def main(): Unit =
     OutputUtils.writeAppendErrors("trains-parsing-errors.txt", trainErrors)
   if tripErrors.nonEmpty then OutputUtils.writeAppendErrors("trips-parsing-errors.txt", tripErrors)
 
-  val top15Stations = allTrips.getTop15Stations()
+  val top15Stations = allStations.getTop15Stations(allTrips)
 
   OutputUtils.writeResults(top15Stations, "top15stations.txt")
   OutputUtils.writeResults(top15Stations, "top15stations.json")
